@@ -1,0 +1,43 @@
+@import "~@simplism/angular/scss/presets/functions";
+@import "~@simplism/angular/scss/presets/colors";
+@import "~@simplism/angular/scss/presets/variables";
+
+$theme-color-pallet: map_merge($theme-color-pallet, (
+  primary: $color-indigo
+));
+
+@import "~@simplism/angular/scss/presets/variables1";
+$theme-color: map_merge($theme-color, (
+  primary: (
+    lightest: get($theme-color-pallet, primary, 50),
+    lighter: get($theme-color-pallet, primary, 100),
+    light: get($theme-color-pallet, primary, 300),
+    default: get($color-light-blue, 900),
+    dark: get($theme-color-pallet, primary, 600),
+    darker: get($theme-color-pallet, primary, 700),
+    darkest: get($theme-color-pallet, primary, 800)
+  ),
+  secondary: (
+    lightest: #E3F2FD,
+    lighter: #BBDEFB,
+    light: #64B5F6,
+    default: #7092BE,
+    dark: #1E88E5,
+    darker: #1565C0,
+    darkest: #014e8f
+  )
+));
+
+@import "~@simplism/angular/scss/presets/variables2";
+@import "~@simplism/angular/scss/presets/variables3";
+@import "~@simplism/angular/scss/presets/mixins";
+
+@import "~@simplism/angular/scss/defaults";
+@import "~@simplism/angular/scss/providers";
+@import "~@simplism/angular/scss/controls";
+@import "~@simplism/angular/scss/classes";
+
+._sd-toast-message {
+}
+
+@import "./app-database-definition";

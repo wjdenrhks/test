@@ -1,0 +1,14 @@
+{
+  "name": "@sample/server",
+  "version": "1.0.0",
+  "description": "Simplism Total Solution Server Package",
+  "repository": "github:wjdenrhks/sample",
+  "private": true,
+  "dependencies": {
+    "@simplism/core": "~10.3.71",
+    "@simplism/socket-server": "~10.3.71",
+    "@simplism/orm-service": "~10.3.71",
+    "mysql": "^2.16.0",
+    "mosca": "^2.8.3"
+  }
+}

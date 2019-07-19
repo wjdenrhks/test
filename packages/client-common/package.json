@@ -1,0 +1,25 @@
+{
+  "name": "@sample/client-common",
+  "version": "1.0.0",
+  "description": "Simplism Total Solution Client Common Package",
+  "repository": "github:wjdenrhks/sample",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "ts-md5": "^1.2.4",
+    "@angular/common": "^7.1.4",
+    "@angular/compiler": "^7.1.4",
+    "@angular/core": "^7.1.4",
+    "@angular/platform-browser": "^7.1.4",
+    "@angular/router": "^7.1.4",
+    "@simplism/angular": "~10.3.71",
+    "@simplism/core": "~10.3.71",
+    "@simplism/orm-query": "~10.3.71",
+    "@simplism/orm-client": "~10.3.71",
+    "@simplism/orm-common": "~10.3.71",
+    "@sample/main-database": "~1.0.280",
+    "core-js": "^2.6.1",
+    "zone.js": "^0.8.26"
+  }
+}

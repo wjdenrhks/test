@@ -1,0 +1,77 @@
+{
+  "packages": [
+    {
+      "name": "server",
+      "type": "server",
+      "publish": {
+        "host": "175.126.232.166",
+        "port": 21,
+        "username": "Administrator",
+        "password": "12tlavmf#$",
+        "path": "sample"
+      }
+    },
+    {
+      "name": "main-database",
+      "type": "library",
+      "publish": false
+    },
+    {
+      "name": "client-common",
+      "type": "library",
+      "publish": false
+    },
+    {
+      "name": "client-admin",
+      "type": "client",
+      "devServer": {
+        "port": 50083
+      },
+      "publish": {
+        "host": "175.126.232.166",
+        "port": 21,
+        "username": "Administrator",
+        "password": "12tlavmf#$",
+        "path": "sample/www/client-admin"
+      }
+    }
+  ],
+  "env": {
+    "PASSWORD_KEY": "sample.2nfu9f3lkc9i3skf30",
+    "SERVER_PORT": 50082
+  },
+  "env.development": {
+    "DB_CONNECTION": {
+      "server": "localhost",
+      "port": 1433,
+      "username": "sa",
+      "password": "1234",
+      "database": "SAMPLE_TS"
+    }
+  },
+  "env.production": {
+    "DB_CONNECTION": {
+      "server": "localhost",
+      "port": 1433,
+      "username": "sa",
+      "password": "12tlavmf#$",
+      "database": "SAMPLE_TS"
+    }
+  },
+  "localDependencies": {
+    "@simplism/angular": "../simplism/packages/angular",
+    "@simplism/angular-hmr": "../simplism/packages/angular-hmr",
+    "@simplism/cli": "../simplism/packages/cli",
+    "@simplism/core": "../simplism/packages/core",
+    "@simplism/excel": "../simplism/packages/excel",
+    "@simplism/orm-client": "../simplism/packages/orm-client",
+    "@simplism/orm-common": "../simplism/packages/orm-common",
+    "@simplism/orm-connector": "../simplism/packages/orm-connector",
+    "@simplism/orm-query": "../simplism/packages/orm-query",
+    "@simplism/orm-service": "../simplism/packages/orm-service",
+    "@simplism/socket-client": "../simplism/packages/socket-client",
+    "@simplism/socket-common": "../simplism/packages/socket-common",
+    "@simplism/socket-server": "../simplism/packages/socket-server",
+    "@simplism/storage": "../simplism/packages/storage"
+  }
+}

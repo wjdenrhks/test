@@ -1,0 +1,17 @@
+{
+  "name": "@sample/main-database",
+  "version": "1.0.0",
+  "description": "Simplism Total Solution - Main Database Package",
+  "repository": "github:wjdenrhks/sample",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "ts-md5": "^1.2.4",
+    "@simplism/core": "~10.3.71",
+    "@simplism/orm-query": "~10.3.71",
+    "@simplism/orm-client": "~10.3.71",
+    "@simplism/orm-common": "~10.3.71",
+    "@simplism/angular": "~10.3.71"
+  }
+}

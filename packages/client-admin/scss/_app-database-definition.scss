@@ -1,0 +1,17 @@
+app-database-definition {
+  table {
+    border-collapse: collapse;
+    background: white;
+
+    th, td {
+      padding: get($gap, xxs) get($gap, xs);
+      border: 1px solid black;
+      vertical-align: top;
+    }
+
+    th {
+      background: get($theme-color, primary, default);
+      color: white;
+    }
+  }
+}

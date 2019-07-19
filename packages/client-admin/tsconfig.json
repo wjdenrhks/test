@@ -1,0 +1,35 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@sample/main-database": [
+        "../main-database/src/index.ts"
+      ],
+      "@sample/client-common": [
+        "../client-common/src/index.ts"
+      ]
+    }
+  },
+  "files": [
+    "src/AppModule.ts",
+    "src/modules/BaseInfoLazyModule.ts",
+    "src/modules/SampleLazyModule.ts",
+    "src/modules/DookwanLazyModule.ts",
+    "src/modules/SampleLazyModule2.ts",
+    "src/modules/ProductionLazyModule.ts",
+    "src/modules/InspectionLazyModule.ts",
+    "src/modules/GoodsTransactionLazyModule.ts",
+    "src/modules/ProcessLazyModule.ts",
+    "src/modules/DocumentLazyModule.ts",
+    "src/modules/ShipmentLazyModule.ts",
+    "src/modules/DevelopmentDocumentLazyModule.ts"
+  ]
+}
