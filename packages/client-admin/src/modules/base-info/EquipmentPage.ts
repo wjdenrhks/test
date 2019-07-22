@@ -6,6 +6,7 @@ import {Queryable} from "@simplism/orm-client";
 import {SdModalProvider, SdOrmProvider, SdSocketProvider, SdToastProvider} from "@simplism/angular";
 import {AppDataProvider} from "@sample/client-common";
 import {ShowManualModal} from "../../modals/ShowManualModal";
+import {ExcelWorkbook} from "@simplism/excel";
 
 @Component({
   selector: "app-equipment",
@@ -23,6 +24,10 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
           <sd-topbar-menu (click)="onSaveButtonClick()">
             <sd-icon [icon]="'save'" [fixedWidth]="true"></sd-icon>
             저장
+          </sd-topbar-menu>
+          <sd-topbar-menu (click)="onDownloadButtonClick()" *ngIf="items">
+            <sd-icon [icon]="'download'" [fixedWidth]="true"></sd-icon>
+            다운로드
           </sd-topbar-menu>
           <sd-topbar-menu (click)="onShowManualButtonClick()" style="float: right; padding-right: 25px;">
             <sd-icon [icon]="'atlas'" [fixedWidth]="true"></sd-icon>
@@ -311,6 +316,53 @@ export class EquipmentPage implements OnInit {
 
     await this.onSearchFormSubmit();
     this._cdr.markForCheck();
+  }
+
+  public async onDownloadButtonClick(): Promise<void> {
+    await this._download();
+    this._cdr.markForCheck();
+  }
+
+  private async _download(): Promise<void> {
+    this.viewBusyCount++;
+    try {
+
+      const wb = ExcelWorkbook.create();
+      const ws = wb.createWorksheet(`생산일보 현황`);
+
+      //TODO : 첫 행 높이 조절 할 수 있으면 조절
+      ws.cell(0, 0).merge(0, 6);
+      ws.cell(0, 0).value = "설비 관리";
+      ws.cell(1, 0).value = "ID";
+      ws.cell(1, 1).value = "설비명";
+      ws.cell(1, 2).value = "설비기호";
+      ws.cell(1, 3).value = "집계";
+      ws.cell(1, 4).value = "등록자";
+      ws.cell(1, 5).value = "등록일시";
+      ws.cell(1, 6).value = "사용중지";
+
+      let nowScrapSeq = 0;
+      for (const nowScrapItem of this.items! || []) {
+        ws.cell(2 + nowScrapSeq, 0).value = nowScrapItem.id;
+        ws.cell(2 + nowScrapSeq, 1).value = nowScrapItem.name;
+        ws.cell(2 + nowScrapSeq, 2).value = nowScrapItem.code;
+        ws.cell(2 + nowScrapSeq, 3).value = nowScrapItem.isCount;
+        ws.cell(2 + nowScrapSeq, 4).value = nowScrapItem.employeeName;
+        ws.cell(2 + nowScrapSeq, 5).value = nowScrapItem.createdAtDateTime!.toFormatString('yyyy-MM-dd');
+        nowScrapItem.isDisabled === true ? ws.cell(2 + nowScrapSeq, 6).value = "V" : ws.cell(2 + nowScrapSeq, 6).value = "";
+        nowScrapSeq++;
+      }
+
+      const title = "설비 관리.xlsx";
+
+      await wb.downloadAsync(title);
+    }
+    catch (err) {
+      this._toast.danger(err.message);
+      if (process.env.NODE_ENV !== "production") console.error(err);
+    }
+
+    this.viewBusyCount--;
   }
 
   public async onShowManualButtonClick(): Promise<void> {
