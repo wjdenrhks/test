@@ -16,6 +16,10 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
         <sd-topbar class="sd-background-secondary-darkest">
           <h4>설비 관리</h4>
 
+          <sd-topbar-menu (click)="onAddItemButtonClick()">
+            <sd-icon [icon]="'plus'" [fixedWidth]="true"></sd-icon>
+            행 추가
+          </sd-topbar-menu>
           <sd-topbar-menu (click)="onSaveButtonClick()">
             <sd-icon [icon]="'save'" [fixedWidth]="true"></sd-icon>
             저장
@@ -68,41 +72,56 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
                   <ng-template #item let-item="item">
                     <div class="sd-padding-xs-sm" style="text-align: center;">
                       <span *ngIf="item.id">{{ item.id }}</span>
+                      <a *ngIf="!item.id" (click)="onRemoveItemButtonClick(item)">
+                        <sd-icon [icon]="'times'" [fixedWidth]="true"></sd-icon>
+                      </a>
                     </div>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'설비명'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.name }}
-                    </div>
+                    <sd-textfield [(value)]="item.name" [required]="true"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'설비기호'" [width]="90">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm" style="text-align: center;">
-                      {{ item.code }}
-                    </div>
+                    <sd-textfield [(value)]="item.code"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
-                <sd-sheet-column [header]="'순서'" [width]="60">
+                <!--<sd-sheet-column [header]="'순서'" [width]="60">
                   <ng-template #item let-item="item">
                     <div class="sd-padding-xs-sm" style="text-align: center;">
                       {{ item.seq }}
                     </div>
                   </ng-template>
-                </sd-sheet-column>
+                </sd-sheet-column>-->
                 <sd-sheet-column [header]="'집계'" [width]="60">
                   <ng-template #item let-item="item">
                     <div style="text-align: center;">
-                      <sd-checkbox [(value)]="item.isCount" [disabled]="true"></sd-checkbox>
+                      <sd-checkbox [(value)]="item.isCount"></sd-checkbox>
+                    </div>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'등록자'" [width]="60">
+                  <ng-template #item let-item="item">
+                    <div class="sd-padding-xs-sm" style="text-align: center;">
+                      {{ item.employeeName }}
+                    </div>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'등록일시'" [width]="90">
+                  <ng-template #item let-item="item">
+                    <div class="sd-padding-xs-sm" style="text-align: center;">
+                      {{ item.createdAtDateTime?.toFormatString("yyyy-MM-dd") }}
                     </div>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'사용중지'" [width]="70">
                   <ng-template #item let-item="item">
                     <div style="text-align: center;">
-                      <sd-checkbox [(value)]="item.isDisabled" [disabled]="true"></sd-checkbox>
+                      <sd-checkbox [(value)]="item.isDisabled"></sd-checkbox>
                     </div>
                   </ng-template>
                 </sd-sheet-column>
@@ -157,11 +176,64 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
                           <sd-textfield [(value)]="item.price"></sd-textfield>
                         </ng-template>
                       </sd-sheet-column>
-                      <sd-sheet-column [header]="'등록자'">
+                      <!--<sd-sheet-column [header]="'등록자'">
                         <ng-template #item let-item="item">
                           <div class="sd-padding-xs-sm" style="text-align: center;">
                             {{ item.createdByEmployeeName }}
                           </div>
+                        </ng-template>
+                      </sd-sheet-column>-->
+                      <sd-sheet-column [header]="'등록시간'">
+                        <ng-template #item let-item="item">
+                          <div class="sd-padding-xs-sm" style="text-align: center;">
+                            {{ item.createdAtDateTime?.toFormatString("yyyy-MM-dd HH:mm") }}
+                          </div>
+                        </ng-template>
+                      </sd-sheet-column>
+                    </sd-sheet>
+                  </sd-pane>
+                </sd-dock-container>
+              </sd-dock>
+
+              <sd-dock [position]="'right'" *ngIf="selectedItem"
+                       [id]="'equipment-repair-list'">
+                <sd-dock-container class="sd-background-default">
+                  <sd-dock class="sd-padding-xs-sm">
+                    <h5 style="display: inline-block; padding-right: 1.4em;">설비별 설비 이력</h5>
+                    <sd-form [inline]="true">
+                      <sd-form-item>
+                        <sd-button [size]="'sm'" (click)="onAddEquipmentEquipmentButtonClick()">
+                          <sd-icon [icon]="'plus'" [fixedWidth]="true"></sd-icon>
+                          행 추가
+                        </sd-button>
+                      </sd-form-item>
+                    </sd-form>
+                  </sd-dock>
+
+                  <sd-pane>
+                    <sd-sheet [id]="'equipment-repair'"
+                              [items]="selectedItem.equipmentList"
+                              [trackBy]="trackByIdFn">
+                      <sd-sheet-column [header]="'ID'" [fixed]="true" [width]="40">
+                        <ng-template #item let-item="item">
+                          <div class="sd-padding-xs-sm" style="text-align: center;">
+                            <span *ngIf="item.id">{{ item.id }}</span>
+                            <a *ngIf="!item.id" (click)="onRemoveItemEquipmentEquipmentButtonClick(item)">
+                              <sd-icon [icon]="'times'" [fixedWidth]="true"></sd-icon>
+                            </a>
+                          </div>
+                        </ng-template>
+                      </sd-sheet-column>
+                      <sd-sheet-column [header]="'설비명'">
+                        <ng-template #item let-item="item">
+                          <div class="sd-padding-xs-sm" style="text-align: center;">
+                            {{ item.name }}
+                          </div>
+                        </ng-template>
+                      </sd-sheet-column>
+                      <sd-sheet-column [header]="'내용'">
+                        <ng-template #item let-item="item">
+                          <sd-textfield [(value)]="item.content"></sd-textfield>
                         </ng-template>
                       </sd-sheet-column>
                       <sd-sheet-column [header]="'등록시간'">
@@ -171,6 +243,25 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
                           </div>
                         </ng-template>
                       </sd-sheet-column>
+                      <sd-sheet-column [header]="'등록자'">
+                        <ng-template #item let-item="item">
+                          <div class="sd-padding-xs-sm" style="text-align: center;">
+                            {{ item.employeeName }}
+                          </div>
+                        </ng-template>
+                      </sd-sheet-column>
+                      <sd-sheet-column [header]="'삭제'" [width]="60">
+                      <ng-template #item let-item="item">
+                        <div class="sd-padding-xs-sm" style="text-align: center;">
+                          <a *ngIf="!item.id" (click)="onRemoveItemProductionGoodButtonClick(item)">
+                            <sd-icon [icon]="'times'" [fixedWidth]="true"></sd-icon>
+                          </a>
+                          <a *ngIf="!!item.id" (click)="onCompletelyRemoveItemProductionGoodButtonClick(item)">
+                            <sd-icon [icon]="'times'" [fixedWidth]="true"></sd-icon>
+                          </a>
+                        </div>
+                      </ng-template>
+                    </sd-sheet-column>
                     </sd-sheet>
                   </sd-pane>
                 </sd-dock-container>
@@ -247,10 +338,67 @@ export class EquipmentPage implements OnInit {
     });
   }
 
+  // 행 추가 시 상단에서 클릭 한 설비의 설비 수리 이력을 입력할 수 있는 행이 추가 됩
+  public onAddEquipmentEquipmentButtonClick(): void {
+    // 이미 입력했던 설비 수리 이력이 있을 경우 엔 기존 리스트를, 없을 경우 엔 초기화
+    this.selectedItem!.equipmentList = this.selectedItem!.equipmentList || [];
+
+    // 추가 되는 행에 들어가는 정보들
+    this.selectedItem!.equipmentList!.insert(0, {
+      id: undefined,
+      name: this.selectedItem!.name,
+      content: undefined,
+      createdAtDateTime: new DateTime(),
+      employeeName: this._appData.authInfo!.employeeName
+    });
+  }
+
+  public onRemoveItemButtonClick(item: IEquipmentVM): void {
+    this.items!.remove(item);
+  }
+
+  public async onRemoveItemProductionGoodButtonClick(item: IEquipmentEquipmentVM): Promise<void> {
+    this.selectedItem!.equipmentList!.remove(item);
+    this._cdr.markForCheck();
+  }
+
+  public async onCompletelyRemoveItemProductionGoodButtonClick(item: IEquipmentEquipmentVM): Promise<void> {
+    if (!confirm("삭제할 경우 다시 추가해야 합니다.\n삭제하시겠습니까?")) return;
+
+    await this._orm.connectAsync(MainDbContext, async db => {
+      await db.equipmentByEquipment.where(item1 => [sorm.equal(item1.id, item.id)]).deleteAsync();
+    });
+
+    this.selectedItem!.equipmentList!.remove(item);
+    // if (!this.selectedItem!.equipmentList && this.selectedItem!.equipmentList!.length < 1) {
+    //   this.selectedItem!.isProductionGoods = false;
+    // }
+    this._cdr.markForCheck();
+  }
+
   // 행을 삭제할 때
   public onRemoveItemRepairEquipmentButtonClick(item: IEquipmentRepairItemVM): void {
     // 현재 선택한 item 객체를 this.selectedItem!.repairList에서 삭제
     this.selectedItem!.repairList!.remove(item);
+  }
+
+  public onRemoveItemEquipmentEquipmentButtonClick(item: IEquipmentEquipmentVM): void {
+    this.selectedItem!.equipmentList!.remove(item);
+  }
+
+  public onAddItemButtonClick(): void {
+    this.items.insert(0, {
+      id: undefined,
+      name: undefined,
+      code: undefined,
+      isCount: false,
+      seq: undefined,
+      employeeName: undefined,
+      createdAtDateTime: new DateTime(),
+      isDisabled: false,
+      repairList: undefined,
+      equipmentList: undefined
+    });
   }
 
   public async onSearchFormSubmit(): Promise<void> {
@@ -309,11 +457,72 @@ export class EquipmentPage implements OnInit {
       return;
     }
 
+    for (const diffTargetItem of diffTargets) {
+      if (!diffTargetItem.name) {
+        this._toast.danger("설비명은 반드시 입력해야 합니다.");
+        return;
+      }
+
+      if (this.items.filter(item => (item.name === diffTargetItem.name)).length > 1) {
+        this._toast.danger("설비명에 동일한 값이 등록되어 있습니다. : " + diffTargetItem.name);
+        return;
+      }
+    }
+
     this.viewBusyCount++;
     try {
       await this._orm.connectAsync(MainDbContext, async db => {
         // 변경 된 값이 있을 경우
         for (const diffTarget of diffTargets) {
+
+          if (!diffTarget!.id) {
+            //insert
+
+            const lastSeq = await db.equipment
+              .orderBy(item => item.seq)
+              .top(1)
+              .select(item => ({
+                seq: item.seq
+              }))
+              .singleAsync();
+
+            const newItem = await db.equipment
+              .insertAsync({
+                companyId: this._appData.authInfo!.companyId,
+                name: diffTarget.name!,
+                code: diffTarget.code,
+                isCount: diffTarget.isCount!,
+                createdByEmployeeId: this._appData.authInfo!.employeeId,
+                createdAtDateTime: new DateTime(),
+                isDisabled: diffTarget.isDisabled!,
+                erpSyncCode: 1,
+                seq: lastSeq ? lastSeq.seq : 1
+              });
+            diffTarget.id = newItem.id;
+
+          }
+          else {
+            //update
+
+            await db.equipment
+              .where(item => [
+                sorm.equal(item.id, diffTarget.id)
+              ])
+              .updateAsync(
+                () => ({
+                  companyId: this._appData.authInfo!.companyId,
+                  name: diffTarget.name!,
+                  code: diffTarget.code,
+                  isCount: diffTarget.isCount!,
+                  createdByEmployeeId: this._appData.authInfo!.employeeId,
+                  isDisabled: diffTarget.isDisabled!,
+                  erpSyncCode: 1,
+                  seq: 1
+                })
+              );
+
+          }
+
           for (const repairItem of diffTarget!.repairList || []) {
             // id가 없으면 추가 된 항목 => insert처리
             if (!repairItem!.id) {
@@ -349,6 +558,34 @@ export class EquipmentPage implements OnInit {
                 );
             }
           }
+
+          for (const equipmentItem of diffTarget!.equipmentList || []) {
+            if (!equipmentItem!.id) {
+              //insert
+              const newItem = await db.equipmentByEquipment
+                .insertAsync({
+                  companyId: this._appData.authInfo!.companyId,
+                  equipmentId: diffTarget.id!,
+                  createdAtDateTime: new DateTime(),
+                  createdByEmployeeId: this._appData.authInfo!.employeeId,
+                  content: equipmentItem.content
+                });
+              equipmentItem.id = newItem.id;
+            }
+            else {
+              //update
+              await db.equipmentByEquipment
+                .where(item => [
+                  sorm.equal(item.id, equipmentItem.id)
+                ])
+                .updateAsync(
+                  () => ({
+                    content: equipmentItem.content
+                  })
+                );
+            }
+          }
+
         }
       });
 
@@ -375,6 +612,10 @@ export class EquipmentPage implements OnInit {
         this.items = await queryable
           .include(item => item.repair)
           .include(item => item.repair![0].employee)
+          .include(item => item.employee)
+          .include(item => item.equipmentByEquipment)
+          .include(item => item.equipmentByEquipment![0].employee)
+          .include(item => item.equipmentByEquipment![0].equipment)
           .select(item => ({
             id: item.id,
             name: item.name,
@@ -382,6 +623,8 @@ export class EquipmentPage implements OnInit {
             isCount: item.isCount,
             seq: item.seq,
             isDisabled: item.isDisabled,
+            createdAtDateTime: item.createdAtDateTime,
+            employeeName : item.employee!.name,
 
             repairList: item.repair && item.repair.map(item1 => ({
               id: item1.id,
@@ -392,6 +635,17 @@ export class EquipmentPage implements OnInit {
               createdByEmployeeId: item1.createdByEmployeeId,
               createdByEmployeeName: item1.employee!.name,
               createdAtDateTime: item1.createdAtDateTime
+            })),
+
+            equipmentList: item.equipmentByEquipment && item.equipmentByEquipment.map(item2 => ({
+              id: item2.id,
+              name: item2.equipment!.name,
+              content: item2.content,
+              createdAtDateTime: item2.createdAtDateTime,
+              employeeName : item2.employee!.name
+
+
+
             }))
           }))
           .orderBy(item => item.seq)
@@ -399,11 +653,6 @@ export class EquipmentPage implements OnInit {
           .wrap()
           .resultAsync();
         this.orgItems = Object.clone(this.items);
-
-
-        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        console.log(this.items);
-        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
         const totalCount = await queryable.countAsync();
         this.pagination.length = Math.ceil(totalCount / 50);
@@ -458,9 +707,12 @@ interface IEquipmentVM {
   code: string | undefined;
   isCount: boolean | undefined;
   seq: number | undefined;
+  employeeName: string | undefined;
+  createdAtDateTime: DateTime | undefined;
   isDisabled: boolean | undefined;
 
   repairList: IEquipmentRepairItemVM[] | undefined;
+  equipmentList: IEquipmentEquipmentVM[] | undefined;
 }
 
 interface IEquipmentRepairItemVM {
@@ -472,4 +724,12 @@ interface IEquipmentRepairItemVM {
   createdByEmployeeId: number | undefined;
   createdByEmployeeName: string | undefined;
   createdAtDateTime: DateTime | undefined;
+}
+
+interface IEquipmentEquipmentVM {
+  id: number | undefined;
+  name: string | undefined;
+  content: string | undefined;
+  createdAtDateTime: DateTime | undefined;
+  employeeName: string | undefined;
 }

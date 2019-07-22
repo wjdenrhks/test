@@ -34,6 +34,7 @@ import {GoodsIssueGoods} from "./models/goods-transaction/GoodsIssueGoods";
 
 import {ProductionPlan} from "./models/production/ProductionPlan";
 import {RepairByEquipment} from "./models/base-info/RepairByEquipment";
+import {EquipmentByEquipment} from "./models/base-info/EquipmentByEquipment";
 import {ErpSync} from "./models/system/ErpSync";
 import {ProductionInfo} from "./models/base-info/ProductionInfo";
 import {EquipmentByGoods} from "./models/base-info/EquipmentByGoods";
@@ -98,6 +99,7 @@ export class MainDbContext extends DbContext {
   public unit = new Queryable(this, Unit);
   public warehouse = new Queryable(this, Warehouse);
   public repairByEquipment = new Queryable(this, RepairByEquipment);
+  public equipmentByEquipment = new Queryable(this, EquipmentByEquipment);
   public userGroup = new Queryable(this, UserGroup);
   public userGroupPermission = new Queryable(this, UserGroupPermission);
   public goodsInspectionChart = new Queryable(this, GoodsInspectionChart);

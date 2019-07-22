@@ -4,6 +4,7 @@ import {DateTime} from "@simplism/core";
 import {Employee} from "./Employee";
 import {RepairByEquipment} from "./RepairByEquipment";
 import {EquipmentStopInfo} from "./EquipmentStopInfo";
+import {EquipmentByEquipment} from "./EquipmentByEquipment";
 
 
 @Table({description: "설비"})
@@ -62,6 +63,9 @@ export class Equipment {
 
   @ForeignKeyTarget(() => RepairByEquipment, "equipment", "설비별 수리 이력")
   public repair?: RepairByEquipment[];
+
+  @ForeignKeyTarget(() => EquipmentByEquipment, "equipment", "설비별 설비 이력")
+  public equipmentByEquipment?: EquipmentByEquipment[];
 
   @ForeignKeyTarget(() => EquipmentStopInfo, "equipment", "설비별 비가동 이력")
   public stop?: EquipmentStopInfo[];

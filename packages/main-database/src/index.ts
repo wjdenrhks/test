@@ -19,6 +19,7 @@ export * from "./models/base-info/Partner";
 export * from "./models/base-info/Warehouse";
 export * from "./models/base-info/Unit";
 export * from "./models/base-info/RepairByEquipment";
+export * from "./models/base-info/EquipmentByEquipment";
 export * from "./models/base-info/ProductionInfo";
 export * from "./models/base-info/UserGroup";
 export * from "./models/base-info/UserGroupPermission";
