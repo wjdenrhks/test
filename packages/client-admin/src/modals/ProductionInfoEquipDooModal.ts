@@ -4,7 +4,6 @@ import {Queryable} from "@simplism/orm-client";
 import {sorm} from "@simplism/orm-query";
 import {AppDataProvider} from "@sample/client-common";
 import {EquipmentByGoods, MainDbContext} from "@sample/main-database";
-import {EquipmentSearchModal} from "./EquipmentSearchModal";
 import {GoodsSearchModal} from "./GoodsSearchModal";
 
 @Component({
@@ -141,6 +140,25 @@ export class ProductionInfoEquipDooModal extends SdModalBase<{ goodId?: number; 
   public async onAddButtonClick(): Promise<void> {
     const result = await this._modal.show(GoodsSearchModal, "설비 검색", {isMulti: true});
     if (!result) return;
+
+    for (const resultItem of result || []) {
+      if (this.items.filter(item1 => item1.equipmentId === resultItem.id).length < 1) {
+        this.items.insert(0, {
+          id: undefined,
+          idSeq: undefined,
+          seq: undefined,
+          productionInfoId: this.lastFilter!.productionInfoId!,
+          equipmentId: resultItem.id,
+          equipmentName: resultItem.name,
+          quantity: 1,
+          min: undefined,
+          isDeleted: false
+        });
+      }
+    }
+
+    this._cdr.markForCheck();
+
   }
 
   private async _search(): Promise<void> {

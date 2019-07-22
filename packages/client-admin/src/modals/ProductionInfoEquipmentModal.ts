@@ -194,6 +194,13 @@ export class ProductionInfoEquipmentModal extends SdModalBase<{ goodId?: number;
       return;
     }
 
+    for (const diffTargetItem of diffTargets) {
+      if (!diffTargetItem.min) {
+        this._toast.danger("시간은 반드시 입력해야 합니다.");
+        return;
+      }
+    }
+
     try {
       await this._orm.connectAsync(MainDbContext, async db => {
 

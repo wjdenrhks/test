@@ -6,7 +6,7 @@ import {Queryable} from "@simplism/orm-client";
 import {sorm} from "@simplism/orm-query";
 import {AppDataProvider} from "@sample/client-common";
 import {DateTime} from "@simplism/core";
-import {ProductionInfoEquipDooModal} from "../../modals/ProductionInfoEquipDooModal";
+import {ProductionInfoEquipmentModal} from "../../modals/ProductionInfoEquipmentModal";
 
 @Component({
   selector: "app-production-info",
@@ -344,21 +344,38 @@ export class ProductionInfoPage implements OnInit {
     this._cdr.markForCheck();
   }
 
+  public onAddItemButtonClick(): void {
+    this.items.insert(0, {
+      id: undefined,
+      goodId: undefined,
+      goodType: undefined,
+      goodCategory: undefined,
+      goodName: undefined,
+      specification: undefined,
+      unitName: undefined,
+      isDisabled: false,
+      isProductionGoods: false,
+
+      saleGoods: undefined,
+      productionGoods: undefined
+    });
+  }
+
   public async onSelectedItemChanged(item: IProductionInfoVM, isCheck?: boolean): Promise<void> {
 
-    // if (item && !item.goodId && !isCheck) {
-    //   this._toast.danger("생산정보를 입력 할 품목을 먼저 선택해 주세요.");
-    //   this.selectedItem = undefined;
-    //   this._cdr.markForCheck();
-    //   return;
-    // }
-    // else if (item && !item.goodId && isCheck) {
-    //   this.selectedItem = undefined;
-    //   this._cdr.markForCheck();
-    //   return;
-    // }
-    //
-    // await this._selectItem(item);
+    if (item && !item.goodId && !isCheck) {
+      this._toast.danger("생산정보를 입력 할 품목을 먼저 선택해 주세요.");
+      this.selectedItem = undefined;
+      this._cdr.markForCheck();
+      return;
+    }
+    else if (item && !item.goodId && isCheck) {
+      this.selectedItem = undefined;
+      this._cdr.markForCheck();
+      return;
+    }
+
+    //await this._selectItem(item);
     this._cdr.markForCheck();
   }
 
@@ -377,15 +394,15 @@ export class ProductionInfoPage implements OnInit {
   }
 
   public async productionInfoEquipmentModalOpenButtonClick(item: IProductionGoodsVM): Promise<void> {
-    // const result = await this._modal.show(ProductionInfoEquipmentModal, "제품별 설비", {
-    //   goodId: item.goodId,
-    //   productionInfoId: item.id
-    // });
-
-    const result = await this._modal.show(ProductionInfoEquipDooModal, "제품별 설비", {
+    const result = await this._modal.show(ProductionInfoEquipmentModal, "제품별 설비", {
       goodId: item.goodId,
       productionInfoId: item.id
     });
+
+    // const result = await this._modal.show(ProductionInfoEquipModal, "제품별 설비", {
+    //   goodId: item.goodId,
+    //   productionInfoId: item.id
+    // });
 
     if (!result) return;
 
@@ -594,6 +611,14 @@ export class ProductionInfoPage implements OnInit {
     return result ? result.length > 0 : false;
   }
 
+  public onRemoveItemButtonClick(item: IProductionInfoVM): void {
+    this.items.remove(item);
+
+    if (this.selectedItem === item) {
+      this.selectedItem = undefined;
+    }
+  }
+
   public async onAddProductionGoodButtonClick(flag: boolean): Promise<void> {
 
     this.selectedItem!.productionGoods = this.selectedItem!.productionGoods || [];
@@ -632,9 +657,89 @@ export class ProductionInfoPage implements OnInit {
     this.selectedItem!.isProductionGoods = true;
   }
 
+  public async onChangeGood(goodId: number, item: IProductionInfoVM): Promise<void> {
+    if (goodId) {
+      await this._orm.connectAsync(MainDbContext, async db => {
+        const result = await db.goods
+          .where(item1 => [
+            sorm.equal(item1.id, goodId)
+          ])
+          .select(item1 => ({
+            id: item1.id,
+            type: item1.type,
+            name: item1.name,
+            category: item1.category,
+            specification: item1.specification,
+            unitPrice: item1.unitPrice,
+            unitName: item1.unitName
+          }))
+          .singleAsync();
+
+        if (result) {
+          if (this.items.some(item1 => item !== item1 && item1.goodId === result.id)) {
+            item.goodType = undefined;
+            item.goodId = undefined;
+            item.goodName = undefined;
+            item.goodCategory = undefined;
+            item.specification = undefined;
+            item.unitName = undefined;
+            this._toast.danger("이미 입력되어 있는 품목입니다.");
+            return;
+          }
+
+          if (!!(await this._getProductionGoodInfo(result!.id!))) {
+            item.goodType = undefined;
+            item.goodId = undefined;
+            item.goodName = undefined;
+            item.goodCategory = undefined;
+            item.specification = undefined;
+            item.unitName = undefined;
+            this._toast.danger("이미 등록되어 있는 품목입니다.");
+            return;
+          }
+
+          item.goodId = result.id;
+          item.goodType = result.type;
+          item.goodName = result.name;
+          item.goodCategory = result.category;
+          item.specification = result.specification;
+          item.unitName = result.unitName;
+        }
+      });
+    }
+    else {
+      item.goodType = undefined;
+      item.goodId = undefined;
+      item.goodName = undefined;
+      item.goodCategory = undefined;
+      item.specification = undefined;
+      item.unitName = undefined;
+    }
+
+    await this.onSelectedItemChanged(item, true);
+    this._cdr.markForCheck();
+  }
+
+  public async _getProductionGoodInfo(goodId: number): Promise<Number | undefined> {
+    let result: number | undefined;
+    await this._orm.connectAsync(MainDbContext, async db => {
+      result = await db.productionInfo
+        .where(item => [sorm.equal(item.goodId, goodId)])
+        .countAsync();
+    });
+
+    return result;
+  }
+
   public async onSearchFormSubmit(): Promise<void> {
     this.pagination.page = 0;
     this.lastFilter = Object.clone(this.filter);
+    await this._search();
+    this._cdr.markForCheck();
+  }
+
+  public async onPageClick(page: number): Promise<void> {
+    this.pagination.page = page;
     await this._search();
     this._cdr.markForCheck();
   }

@@ -59,7 +59,7 @@ import {Equipment} from "../../../main-database/src";
                 </div>
               </ng-template>
             </sd-sheet-column>
-            <sd-sheet-column [header]="'순서'" [width]="60">
+            <!--<sd-sheet-column [header]="'순서'" [width]="60">
               <ng-template #item let-item="item">
                 <div class="sd-padding-xs-sm" style="text-align: center;">
                   {{ item.seq }}
@@ -79,7 +79,7 @@ import {Equipment} from "../../../main-database/src";
                   <sd-checkbox [(value)]="item.isDisabled" [disabled]="true"></sd-checkbox>
                 </div>
               </ng-template>
-            </sd-sheet-column>
+            </sd-sheet-column>-->
           </sd-sheet>
           <sd-dock [position]="'bottom'"
                    style="text-align: right; padding-right: 20px; padding-top: 5px; margin-top: 5px; margin-bottom: 5px;">

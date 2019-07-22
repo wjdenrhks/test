@@ -348,7 +348,8 @@ export class GoodsSearchModal extends SdModalBase<{ goodId?: number; isMulti?: b
             adequateStockRate: item.adequateStockRate,
             remark: item.remark,
             erpSyncCode: item.erpSyncCode,
-            isDisabled: item.isDisabled
+            isDisabled: item.isDisabled,
+            purpose: item.purpose
           }))
           .resultAsync();
 
@@ -371,7 +372,8 @@ export class GoodsSearchModal extends SdModalBase<{ goodId?: number; isMulti?: b
           adequateStockRate: item.adequateStockRate,
           remark: item.remark,
           erpSyncCode: item.erpSyncCode,
-          isDisabled: item.isDisabled
+          isDisabled: item.isDisabled,
+          purpose: item.purpose
         }));
 
         const totalCount = await queryable.countAsync();
