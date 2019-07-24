@@ -43,6 +43,12 @@ export class Employee {
   @Column({description: "사용중지여부"})
   public isDisabled!: boolean;
 
+  @Column({description: "등급", nullable: true})
+  public grade?: string;
+
+  @Column({description: "전화번호", nullable: true})
+  public tel?: string;
+
   //------------------------------------
 
   @ForeignKey("companyId", () => Company, "회사")

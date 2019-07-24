@@ -1,10 +1,11 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {AppDataProvider} from "@sample/client-common";
 import {RouteConfigLoadEnd, RouteConfigLoadStart, Router} from "@angular/router";
-import {IAuthInfo, MainDbContext, MySqlProc} from "@sample/main-database";
+import {Employee, IAuthInfo, MainDbContext, MySqlProc} from "@sample/main-database";
 import {DateTime, JsonConvert} from "@simplism/core";
 import {SdOrmProvider, SdSocketProvider, SdToastProvider} from "@simplism/angular";
 import {sorm} from "@simplism/orm-query";
+import {Queryable} from "@simplism/orm-client";
 
 @Component({
   selector: "app-home",
@@ -109,6 +110,11 @@ export class HomePage implements OnInit {
     }[];
   }[] = [];
 
+  public permissions: {
+    code: string;
+    category: string;
+  }[] = [];
+
   public alarms: IAlarmVM[] = [];
 
   public busyCount = 0;
@@ -125,12 +131,12 @@ export class HomePage implements OnInit {
                      private readonly _cdr: ChangeDetectorRef) {
   }
 
-  private _getMenuItem(title: string, category: string, page: string): { title: string; path: string } | undefined {
-    return {
-      title,
-      path: `/home/${category}/${page}`
-    };
-  }
+  // private _getMenuItem(title: string, category: string, page: string): { title: string; path: string } | undefined {
+  //   return {
+  //     title,
+  //     path: `/home/${category}/${page}`
+  //   };
+  // }
 
   public async ngOnInit(): Promise<void> {
     this._router.events.subscribe(event => {
@@ -151,80 +157,80 @@ export class HomePage implements OnInit {
     this.menus = [
       {
         icon: "cog", title: "기준정보 관리", children: [
-          this._getMenuItem("기초정보", "base-info", "base-type"),
+          /*this._getMenuItem("기초정보", "base-info", "base-type"),
           this._getMenuItem("거래처 정보", "base-info", "partner"),
           this._getMenuItem("제품 정보", "base-info", "goods"),
           this._getMenuItem("생산 정보", "base-info", "production-info"),
-          /*this._getMenuItem("BOM 정보", "base-info", "goods-build"),
+          /!*this._getMenuItem("BOM 정보", "base-info", "goods-build"),
           this._getMenuItem("제품 그룹 정보(생산)", "base-info", "goods-group"),
-          this._getMenuItem("제품 그룹 정보(BOM)", "base-info", "goods-build-group"),*/
+          this._getMenuItem("제품 그룹 정보(BOM)", "base-info", "goods-build-group"),*!/
           this._getMenuItem("설비 정보", "base-info", "equipment"),
           this._getMenuItem("창고 관리", "base-info", "warehouse"),
           this._getMenuItem("사용자 정보", "base-info", "employee"),
-          this._getMenuItem("사용자 권한 정보", "base-info", "employee-permission")
+          this._getMenuItem("사용자 권한 정보", "base-info", "employee-permission")*/
         ].filterExists()
       },
       {
         icon: "retweet", title: "생산 관리", children: [
-          this._getMenuItem("생산계획 정보", "production", "production-plan"),
-          this._getMenuItem("생산지시 등록", "production", "production-instruction")
+          /*this._getMenuItem("생산계획 정보", "production", "production-plan"),
+          this._getMenuItem("생산지시 등록", "production", "production-instruction")*/
         ].filterExists()
       },
       {
         icon: "truck-loading", title: "재고 관리", children: [
-          this._getMenuItem("재고입고", "goods-transaction", "goods-receipt"),
+          /*this._getMenuItem("재고입고", "goods-transaction", "goods-receipt"),
           this._getMenuItem("재고이동", "goods-transaction", "stock-transfer"),
           this._getMenuItem("재고조정", "goods-transaction", "stock-adjustment"),
           this._getMenuItem("제품별 재고현황", "goods-transaction", "stock-current"),
           this._getMenuItem("창고별 재고현황", "goods-transaction", "stock-warehouse-current"),
           this._getMenuItem("LOT 전환", "goods-transaction", "lot-trans"),
-          this._getMenuItem("포장관리", "goods-transaction", "packing")
+          this._getMenuItem("포장관리", "goods-transaction", "packing")*/
         ].filterExists()
       },
       {
         icon: "atom", title: "공정 관리", children: [
-          this._getMenuItem("배합처리", "process", "combination-process"),
+          /*this._getMenuItem("배합처리", "process", "combination-process"),
           this._getMenuItem("밀어내기", "process", "process-push"),
           this._getMenuItem("생산실적 등록", "process", "process-production"),
           this._getMenuItem("리와인더 작업", "process", "process-rewind"),
           this._getMenuItem("중량측정", "process", "weight-measurement"),
-          this._getMenuItem("Lot 이력조회", "process", "lot-history")
+          this._getMenuItem("Lot 이력조회", "process", "lot-history")*/
         ].filterExists()
       },
       {
         icon: "bug", title: "품질 관리", children: [
-          this._getMenuItem("수입검사", "inspection", "receipt-inspection"),
+          /*this._getMenuItem("수입검사", "inspection", "receipt-inspection"),
           this._getMenuItem("QC 검사등록", "inspection", "qc-inspection"),
-          this._getMenuItem("Xbar-R 차트", "inspection", "first-middle-last-inspection")
+          this._getMenuItem("Xbar-R 차트", "inspection", "first-middle-last-inspection")*/
         ].filterExists()
       },
       {
         icon: "laptop", title: "출하 관리", children: [
-          this._getMenuItem("출하계획", "shipment", "shipping-plan"),
+          /*this._getMenuItem("출하계획", "shipment", "shipping-plan"),
           this._getMenuItem("출하 등록", "shipment", "shipping-register"),
-          this._getMenuItem("출하 이력 조회", "shipment", "shipping-history")
+          this._getMenuItem("출하 이력 조회", "shipment", "shipping-history")*/
         ].filterExists()
       },
-      {
-        icon: "laptop", title: "테스트", children: [
-          this._getMenuItem("테스트메뉴", "sample", "sample")
-        ].filterExists()
-      },
+      // {
+      //   icon: "laptop", title: "테스트", children: [
+      //     this._getMenuItem("테스트메뉴", "sample", "sample")
+      //   ].filterExists()
+      // },
       // {
       //   icon: "laptop", title: "테스트2", children: [
       //     this._getMenuItem("테스트메뉴2", "sample2", "sample2")
       //   ].filterExists()
       // },
-      {
-        icon: "laptop", title: "두관", children: [
-          this._getMenuItem("두관", "dookwan", "dookwan"),
-          this._getMenuItem("두관2", "dookwan", "doo-two"),
-          this._getMenuItem("두관3", "dookwan", "doo-three")
-        ].filterExists()
-      },
+      // {
+      //   icon: "laptop", title: "두관", children: [
+      //     this._getMenuItem("두관", "dookwan", "dookwan"),
+      //     this._getMenuItem("두관2", "dookwan", "doo-two"),
+      //     this._getMenuItem("두관3", "dookwan", "doo-three")
+      //   ].filterExists()
+      // },
       {
         icon: "code", title: "보고서 관리", children: [
-          this._getMenuItem("생산일보 현황", "document", "production-instruction-report"),
+          /*this._getMenuItem("생산일보 현황", "document", "production-instruction-report"),
           this._getMenuItem("스크랩 발생현황", "document", "scrap-status"),
           this._getMenuItem("제품별 스크랩 현황", "document", "good-scrap-status"),
           this._getMenuItem("생산량 대비 LOSS 현황", "document", "production-loss-status"),
@@ -234,14 +240,138 @@ export class HomePage implements OnInit {
           this._getMenuItem("그룹별 생산 현황", "document", "group-production-status"),
           this._getMenuItem("그룹별 Loss 현황", "document", "group-loss-status"),
           this._getMenuItem("호기별 생산일수 및 생산인원", "document", "equipment-production-personnel-status"),
-          this._getMenuItem("발주 현황", "document", "purchase-status")/*,
-          this._getMenuItem("DB", "document", "database-definition")*/
+          this._getMenuItem("발주 현황", "document", "purchase-status")/!*,
+          this._getMenuItem("DB", "document", "database-definition")*!/*/
         ].filterExists()
       }
     ];
 
+    this.permissions = [
+      //기준정보 관리
+      {code: "base-type", category: "기초정보"},
+      {code: "partner", category: "거래처 정보"},
+      {code: "goods", category: "제품 정보"},
+      {code: "production-info", category: "생산 정보"},
+      {code: "equipment", category: "설비 정보"},
+      {code: "warehouse", category: "창고 관리"},
+      {code: "employee", category: "사용자 정보"},
+      {code: "employee-permission", category: "사용자 권한 정보"},
+      //생산 관리
+      {code: "production-plan", category: "사용자 권한 정보"},
+      {code: "production-instruction", category: "생산계획 정보"},
+      //재고 관리
+      {code: "goods-receipt", category: "재고입고"},
+      {code: "stock-transfer", category: "재고이동"},
+      {code: "stock-adjustment", category: "재고조정"},
+      {code: "stock-current", category: "제품별 재고현황"},
+      {code: "stock-warehouse-current", category: "창고별 재고현황"},
+      {code: "lot-trans", category: "LOT 전환"},
+      {code: "packing", category: "포장관리"},
+      //공정 관리
+      {code: "combination-process", category: "배합처리"},
+      {code: "process-push", category: "밀어내기"},
+      {code: "process-production", category: "생산실적 등록"},
+      {code: "process-rewind", category: "리와인더 작업"},
+      {code: "weight-measurement", category: "중량측정"},
+      {code: "lot-history", category: "Lot 이력조회"},
+      //품질 관리
+      {code: "receipt-inspection", category: "수입검사"},
+      {code: "qc-inspection", category: "QC 검사등록"},
+      {code: "first-middle-last-inspection", category: "Xbar-R 차트"},
+      //출하 관리
+      {code: "shipping-plan", category: "출하계획"},
+      {code: "shipping-register", category: "출하 등록"},
+      {code: "shipping-history", category: "출하 이력 조회"},
+      //보고서 관리
+      {code: "production-instruction-report", category: "생산일보 현황"},
+      {code: "scrap-status", category: "스크랩 발생현황"},
+      {code: "good-scrap-status", category: "제품별 스크랩 현황"},
+      {code: "production-loss-status", category: "생산량 대비 LOSS 현황"},
+      {code: "rewind-status", category: "리와인더 현황"},
+      {code: "quarterly-production-status", category: "분기별 생산 현황"},
+      {code: "equipment-input-material-status", category: "호기별 원재료 투입 현황"},
+      {code: "group-production-status", category: "그룹별 생산 현황"},
+      {code: "group-loss-status", category: "그룹별 Loss 현황"},
+      {code: "equipment-production-personnel-status", category: "호기별 생산일수 및 생산인원"},
+      {code: "purchase-status", category: "발주 현황"}
+    ];
+
+    this.busyCount++;
+    try{
+      await this._orm.connectAsync(MainDbContext, async db => {
+        const queryable = this._getSearchQueryable(db);
+
+        let groupId = await queryable
+          .select(item => ({
+            groupId: item.groupId
+          }))
+          .resultAsync();
+
+        let pageData = await db.userGroupPermission
+          .where(item => [
+            sorm.equal(item.userGroupId, groupId[0].groupId)
+          ])
+          .where(item => [
+            sorm.equal(item.valueJson, "true")
+          ])
+          .select(item => ({
+            code: item.code,
+            valueJson: item.valueJson
+          }))
+          .resultAsync();
+
+        for (let i = 0; i < pageData.length; i++) {
+          let path1 = pageData[i].code.substr(0, pageData[i].code.indexOf("."));
+          let path2 = pageData[i].code.substr(pageData[i].code.indexOf(".") + 1, pageData[i].code.length);
+          let path = pageData[i].code.replace(".", "/");
+
+          for (const nowScrapItem of this.permissions! || []) {
+            if (path2 === nowScrapItem.code) {
+
+              if (path1 === "base-info") {
+                this.menus[0].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "production") {
+                this.menus[1].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "goods-transaction") {
+                this.menus[2].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "process") {
+                this.menus[3].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "inspection") {
+                this.menus[4].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "shipment") {
+                this.menus[5].children.push({title: nowScrapItem.category, path: "home/" + path});
+              } else if (path1 === "document") {
+                this.menus[6].children.push({title: nowScrapItem.category, path: "home/" + path});
+              }
+
+            }
+          }
+
+        }
+      });
+    }
+    catch (err) {
+      this._toast.danger(err.message);
+      if (process.env.NODE_ENV !== "production") console.error(err);
+    }
+    this.busyCount--;
+
     await this._refreshAlarms();
     this._cdr.markForCheck();
+  }
+
+  private _getSearchQueryable(db: MainDbContext): Queryable<Employee> {
+    let queryable = db.employee
+      .where(item => [
+        sorm.equal(item.companyId, this._appData.authInfo!.companyId)
+      ]);
+
+    if (this._appData.authInfo!.employeeId) {
+      queryable = queryable.where(item => [
+        sorm.equal(item.id, this._appData.authInfo!.employeeId)
+      ]);
+    }
+    return queryable;
   }
 
   public async onProductionPlanNumberClick(): Promise<void> {

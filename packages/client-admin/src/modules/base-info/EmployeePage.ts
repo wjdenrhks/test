@@ -5,6 +5,7 @@ import {sorm} from "@simplism/orm-query";
 import {SdModalProvider, SdOrmProvider, SdToastProvider} from "@simplism/angular";
 import {AppDataProvider} from "@sample/client-common";
 import {ShowManualModal} from "../../modals/ShowManualModal";
+import {Md5} from "ts-md5";
 
 @Component({
   selector: "app-employee",
@@ -14,6 +15,10 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
       <sd-topbar-container>
         <sd-topbar class="sd-background-secondary-darkest">
           <h4>사용자 관리</h4>
+          <sd-topbar-menu (click)="onAddItemButtonClick()">
+            <sd-icon [icon]="'plus'" [fixedWidth]="true"></sd-icon>
+            행 추가
+          </sd-topbar-menu>
           <sd-topbar-menu (click)="onSaveButtonClick()">
             <sd-icon [icon]="'save'" [fixedWidth]="true"></sd-icon>
             저장
@@ -33,6 +38,12 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
               </sd-form-item>
               <sd-form-item [label]="'사용자명'">
                 <sd-textfield [(value)]="filter.name"></sd-textfield>
+              </sd-form-item>
+              <sd-form-item [label]="'소속'">
+                <sd-textfield [(value)]="filter.department"></sd-textfield>
+              </sd-form-item>
+              <sd-form-item>
+                <sd-checkbox [(value)]="filter.isDisabled">사용중지</sd-checkbox>
               </sd-form-item>
 
               <sd-form-item>
@@ -63,16 +74,41 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'아이디'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.userId }}
-                    </div>
+                    <sd-textfield [(value)]="item.userId"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'이름'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.name }}
-                    </div>
+                    <sd-textfield [(value)]="item.name"
+                    ></sd-textfield>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'비밀번호'" >
+                  <ng-template #item let-item="item">
+                    <sd-textfield [(value)]="item.password" [disabled]="!!item.id" [type]="'password'" 
+                    ></sd-textfield>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'소속'">
+                  <ng-template #item let-item="item">
+                    <sd-textfield [(value)]="item.department"
+                    ></sd-textfield>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'성별'">
+                  <ng-template #item let-item="item">
+                    <sd-select [(value)]="item.sex">
+                      <sd-select-item [value]="undefined">없음</sd-select-item>
+                      <sd-select-item [value]="1">남자</sd-select-item>
+                      <sd-select-item [value]="2">여자</sd-select-item>
+                    </sd-select>
+                  </ng-template>
+                </sd-sheet-column>
+                <sd-sheet-column [header]="'등급'">
+                  <ng-template #item let-item="item">
+                    <sd-textfield [(value)]="item.grade"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'그룹명'">
@@ -84,46 +120,28 @@ import {ShowManualModal} from "../../modals/ShowManualModal";
                     </sd-select>
                   </ng-template>
                 </sd-sheet-column>
-                <sd-sheet-column [header]="'소속'">
+                <sd-sheet-column [header]="'전화번호'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.department }}
-                    </div>
+                    <sd-textfield [(value)]="item.tel"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
-                <sd-sheet-column [header]="'직책'">
+                <sd-sheet-column [header]="'휴대폰'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.position }}
-                    </div>
-                  </ng-template>
-                </sd-sheet-column>
-                <sd-sheet-column [header]="'성별'">
-                  <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.sex === 1 ? "남자" : "여자" }}
-                    </div>
+                    <sd-textfield [(value)]="item.phone"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
                 <sd-sheet-column [header]="'이메일'">
                   <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.email }}
-                    </div>
-                  </ng-template>
-                </sd-sheet-column> 
-                <sd-sheet-column [header]="'휴대폰'">
-                  <ng-template #item let-item="item">
-                    <div class="sd-padding-xs-sm">
-                      {{ item.phone }}
-                    </div>
+                    <sd-textfield [(value)]="item.email"
+                    ></sd-textfield>
                   </ng-template>
                 </sd-sheet-column>
-
-                <sd-sheet-column [header]="'사용중지'" [width]="60">
+                <sd-sheet-column [header]="'사용여부'" [width]="60">
                   <ng-template #item let-item="item">
                     <div style="text-align: center;">
-                      <sd-checkbox [(value)]="item.isDisabled" [disabled]="true"></sd-checkbox>
+                      <sd-checkbox [(value)]="item.isDisabled"></sd-checkbox>
                     </div>
                   </ng-template>
                 </sd-sheet-column>
@@ -140,7 +158,8 @@ export class EmployeePage implements OnInit {
   public filter: IFilterVM = {
     id: undefined,
     name: undefined,
-    isDisabled: false
+    isDisabled: false,
+    department: undefined
   };
 
   public lastFilter?: IFilterVM;
@@ -194,6 +213,25 @@ export class EmployeePage implements OnInit {
     this._cdr.markForCheck();
   }
 
+  public onAddItemButtonClick(): void {
+    this.items.insert(0, {
+      id: undefined,
+      name: undefined,
+      userId: undefined,
+      password: undefined,
+      department: undefined,
+      position: undefined,
+      userGroupId: undefined,
+      userGroupName: undefined,
+      sex: undefined,
+      email: undefined,
+      phone: undefined,
+      isDisabled: false,
+      grade: undefined,
+      tel: undefined
+    });
+  }
+
   public async onSearchFormSubmit(): Promise<void> {
     this.pagination.page = 0;
     this.lastFilter = Object.clone(this.filter);
@@ -222,11 +260,26 @@ export class EmployeePage implements OnInit {
   }
 
   private async _save(): Promise<void> {
+
     const diffTargets = this.orgItems.diffs(this.items, {keyProps: ["id"]}).map(item => item.target!);
     if (diffTargets.length < 1) {
       this._toast.info("변경사항이 없습니다.");
       if (process.env.NODE_ENV === "test") console.log("변경사항이 없습니다.");
       return;
+    }
+
+    for (const diffTargetItem of diffTargets) {
+      if (!diffTargetItem.userId) {
+        this._toast.danger("아이디는 반드시 입력해야 합니다.");
+        return;
+      } else if (!diffTargetItem.name) {
+        this._toast.danger("이름은 반드시 입력해야 합니다.");
+        return;
+      } else if (!diffTargetItem.password) {
+        this._toast.danger("비밀번호는 반드시 입력해야 합니다.");
+        return;
+      }
+
     }
 
     this.viewBusyCount++;
@@ -235,14 +288,52 @@ export class EmployeePage implements OnInit {
       await this._orm.connectAsync(MainDbContext, async db => {
 
         for (const diffTarget of diffTargets) {
-          await db.employee.where(item => [
-            sorm.equal(item.id, diffTarget.id)
-          ])
-            .updateAsync(
-              () => ({
-                groupId: diffTarget.userGroupId
-              })
-            );
+          if (!diffTarget!.id) {
+            //insert
+            console.log("insert");
+            const newItem = await db.employee
+              .insertAsync({
+                companyId: this._appData.authInfo!.companyId,
+                userId: diffTarget.userId!,
+                name: diffTarget.name!,
+                //encryptedPassword: diffTarget.password!,
+                encryptedPassword: String(new Md5().appendStr(diffTarget.password!).end()),
+                department: diffTarget.department,
+                position: diffTarget.position,
+                groupId: diffTarget.userGroupId,
+                sex: diffTarget.sex,
+                emailAddress: diffTarget.email,
+                phoneNumber: diffTarget.phone,
+                isDisabled: diffTarget.isDisabled,
+                grade: diffTarget.grade,
+                tel: diffTarget.tel
+              });
+            diffTarget.id = newItem.id;
+          }
+          else {
+            //update
+            console.log("update");
+            for (const diffTarget of diffTargets) {
+              await db.employee.where(item => [
+                sorm.equal(item.id, diffTarget.id)
+              ])
+                .updateAsync(
+                  () => ({
+                    name: diffTarget.name!,
+                    department: diffTarget.department,
+                    position: diffTarget.position,
+                    groupId: diffTarget.userGroupId,
+                    sex: diffTarget.sex,
+                    emailAddress: diffTarget.email,
+                    phoneNumber: diffTarget.phone,
+                    isDisabled: diffTarget.isDisabled,
+                    grade: diffTarget.grade,
+                    tel: diffTarget.tel
+                  })
+                );
+            }
+
+          }
         }
       });
 
@@ -281,8 +372,9 @@ export class EmployeePage implements OnInit {
             userGroupName: item.userGroup!.name,
             phone: item.phoneNumber,
             email: item.emailAddress,
-            isDisabled: item.isDisabled
-
+            isDisabled: item.isDisabled,
+            grade: item.grade,
+            tel: item.tel
           }))
           .resultAsync();
         this.orgItems = Object.clone(this.items);
@@ -317,6 +409,12 @@ export class EmployeePage implements OnInit {
       ]);
     }
 
+    if (this.lastFilter!.department) {
+      queryable = queryable.where(item => [
+        sorm.includes(item.department, this.lastFilter!.department)
+      ]);
+    }
+
     queryable = queryable.where(item => [
       sorm.equal(item.isDisabled, this.lastFilter!.isDisabled)
     ]);
@@ -329,6 +427,7 @@ interface IFilterVM {
   id?: string;
   name?: string;
   isDisabled: boolean;
+  department?: string;
 }
 
 interface IEmployeeVM {
@@ -344,4 +443,6 @@ interface IEmployeeVM {
   email: string | undefined;
   phone: string | undefined;
   isDisabled: boolean;
+  grade: string | undefined;
+  tel: string | undefined;
 }
